@@ -12,7 +12,7 @@
 #
 # Secondary User Stories
 #
-#        As a user I can save a list to a text file
+#     x  As a user I can save a list to a text file
 #        As a user I can open a list from a text file
 #        As a user I can delete a task
 #        As a user I can update a task
@@ -28,7 +28,7 @@
 #     x  Create a list
 #     x  Add task to list
 #     x  Show all tasks
-#        Write a list to a file
+#     x  Write a list to a file
 #        Read a task from a file
 #        Delete a task
 #        Update a task
@@ -38,15 +38,13 @@
 
 module Menu
 	def menu
-		# I used puts 4 times, but you can just write the string and it
-		# displays itself
 		"Hello, User! Choose a task from the Todo Menu to: 
 		(A/a) ADD a task
 		(S/s) SHOW your tasks
-		# (R/r) READ in a list from a file
-		(W/w) WRITE a list to a file (Not S, S is SHOW)
+		(W/w) WRITE a list to a file    (Not S-AVE, S is SHOW)
 		(Q/q) QUIT the program
 		"
+	#	(R/r) READ in a list from a file
 	end
 
 	def show
@@ -77,18 +75,12 @@ class List
 		all_tasks
 	end
 
-			# puts and gets are Kernel modules and can be called anywhere
-			# write and read are limited to File modules
 	def write_to_file(filename)
-		# @filename=filename.to_s
-		# file=File.open('a',@filename) { |file| file.puts all_tasks }
-
+		IO.write(filename, @all_tasks.map(&:to_s).join("\n"))
 	end
 
 	def read_from_file(filename)
-		file=File.open('r',filename) { |filex| 
-			filex.gets all_tasks
-		}
+		# IO.read(filename, @all_tasks.map(&:to_s).join("\n"))
 	end
 end
 
@@ -126,14 +118,13 @@ if __FILE__ == $PROGRAM_NAME
 		case user_input
 		# Add a Task
 		when 'a'
-			# Gah! I forgot to put the prompt in to ask for the task!
 			list.add(Task.new(prompt('What is the task you want to add?')))
 		# Read Task List from File
 		when 'r'
-			read_from_file = prompt('What is the filename you want to write to?')
+			list.read_from_file(prompt('What is the filename you want to write to?'))
 		# Write Task List to File
 		when 'w'
-			write_to_file(prompt('What is the filename you want to write to?'))
+			list.write_to_file(prompt('What is the filename you want to write to?'))
 		# Show Task List
 		when 's'
 			puts list.show
