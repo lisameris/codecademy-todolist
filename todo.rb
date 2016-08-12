@@ -12,8 +12,8 @@
 #
 # Secondary User Stories
 #
-#        As a user I can open a list from a text file
 #        As a user I can save a list to a text file
+#        As a user I can open a list from a text file
 #        As a user I can delete a task
 #        As a user I can update a task
 #
@@ -28,8 +28,8 @@
 #     x  Create a list
 #     x  Add task to list
 #     x  Show all tasks
-#        Read a task from a file
 #        Write a list to a file
+#        Read a task from a file
 #        Delete a task
 #        Update a task
 #    Task Class
@@ -43,6 +43,8 @@ module Menu
 		"Hello, User! Choose a task from the Todo Menu to: 
 		(A/a) ADD a task
 		(S/s) SHOW your tasks
+		# (R/r) READ in a list from a file
+		(W/w) WRITE a list to a file (Not S, S is SHOW)
 		(Q/q) QUIT the program
 		"
 	end
@@ -74,6 +76,20 @@ class List
 	def show
 		all_tasks
 	end
+
+			# puts and gets are Kernel modules and can be called anywhere
+			# write and read are limited to File modules
+	def write_to_file(filename)
+		# @filename=filename.to_s
+		# file=File.open('a',@filename) { |file| file.puts all_tasks }
+
+	end
+
+	def read_from_file(filename)
+		file=File.open('r',filename) { |filex| 
+			filex.gets all_tasks
+		}
+	end
 end
 
 class Task
@@ -94,17 +110,31 @@ class Task
 	end
 end
 
+
+# if current file is same as program name
+# prevents XXX 
 if __FILE__ == $PROGRAM_NAME
 	include Menu
 	include Promptable
 	list = List.new
 	puts 'Please choose from the following list'
-	# it's as bad as perl!
+		# it's as bad as perl!
+		# this obfuscated expression is saying
+		#  the char 'q' is found in the user_input variable 
+		#              that is the result of lowercasing prompt(show)
 	until ['q'].include?(user_input = prompt(show).downcase)
 		case user_input
+		# Add a Task
 		when 'a'
 			# Gah! I forgot to put the prompt in to ask for the task!
 			list.add(Task.new(prompt('What is the task you want to add?')))
+		# Read Task List from File
+		when 'r'
+			read_from_file = prompt('What is the filename you want to write to?')
+		# Write Task List to File
+		when 'w'
+			write_to_file(prompt('What is the filename you want to write to?'))
+		# Show Task List
 		when 's'
 			puts list.show
 		else
