@@ -13,7 +13,7 @@
 # Secondary User Stories
 #
 #     x  As a user I can save a list to a text file
-#        As a user I can open a list from a text file
+#     x  As a user I can open a list from a text file
 #        As a user I can delete a task
 #        As a user I can update a task
 #
@@ -29,7 +29,7 @@
 #     x  Add task to list
 #     x  Show all tasks
 #     x  Write a list to a file
-#        Read a task from a file
+#     x  Read a list from a file
 #        Delete a task
 #        Update a task
 #    Task Class
@@ -42,15 +42,16 @@ module Menu
 		(A/a) ADD a task
 		(S/s) SHOW your tasks
 		(W/w) WRITE a list to a file    (Not S-AVE, S is SHOW)
+	 	(R/r) READ in a list from a file
 		(Q/q) QUIT the program
 		"
-	#	(R/r) READ in a list from a file
 	end
 
 	def show
 		menu
 	end
 end
+
 
 module Promptable
 	def prompt(message = 'What would you like to do?', symbol = '      :> ')
@@ -76,12 +77,19 @@ class List
 	end
 
 	def write_to_file(filename)
+		# this is writing repeatedly - fix it
 		IO.write(filename, @all_tasks.map(&:to_s).join("\n"))
 	end
 
 	def read_from_file(filename)
-		# IO.read(filename, @all_tasks.map(&:to_s).join("\n"))
+		#alltasks = IO.readlines(filename)
+		IO.foreach(filename) {|line| add(Task.new(line))}
 	end
+
+	def listfiles
+		puts Dir["./*.txt"]
+	end
+
 end
 
 class Task
@@ -103,8 +111,16 @@ class Task
 end
 
 
-# if current file is same as program name
-# prevents XXX 
+# Only run the following code when this file is the main file being run
+# instead of having been required or loaded by another file
+#
+## Explanation:
+#
+# __FILE__ always returns the path of the source file. It's not a variable so you can't assign value to it.
+# Whether it returns a relative path or an absolute one depends on how you run the script.
+#
+# $PROGRAM_NAME or $0 by default returns the command that boots the program (minus the path of the ruby 
+# interpreter). 
 if __FILE__ == $PROGRAM_NAME
 	include Menu
 	include Promptable
@@ -116,18 +132,24 @@ if __FILE__ == $PROGRAM_NAME
 		#              that is the result of lowercasing prompt(show)
 	until ['q'].include?(user_input = prompt(show).downcase)
 		case user_input
-		# Add a Task
 		when 'a'
+			# Add a Task
 			list.add(Task.new(prompt('What is the task you want to add?')))
-		# Read Task List from File
-		when 'r'
-			list.read_from_file(prompt('What is the filename you want to write to?'))
-		# Write Task List to File
-		when 'w'
-			list.write_to_file(prompt('What is the filename you want to write to?'))
-		# Show Task List
 		when 's'
+			# Show Task List
 			puts list.show
+		when 'w'
+			# Write Task List to File
+			list.write_to_file(prompt('What is the filename you want to write to?'))
+		when 'r'
+			# Read Task List from File
+			list.listfiles
+			begin
+			list.read_from_file(prompt('What is the filename you want to read from?'))
+				# rescue avoids erroring out when hitting an ERRNO
+			rescue Errno::ENOENT
+			puts 'File name not found, please verify your file name and path.'
+			end
 		else
 			puts 'Sorry, I did not understand'
 		end
